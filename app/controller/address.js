@@ -5,10 +5,26 @@ class AddressController extends Controller {
     let {ctx} = this
     let {address} = ctx.state
     let summary = await ctx.service.address.getAddressSummary(address.addressIds, address.p2pkhAddressIds, address.rawAddresses)
+    let balanceFloat = summary.balance.toString()
+while (balanceFloat.length < 9)
+	balanceFloat = '0' + balanceFloat
+    balanceFloat = balanceFloat.slice(0, -8) + '.' + balanceFloat.slice(-8)
+    let totalReceivedFloat = summary.totalReceived.toString()
+while (totalReceivedFloat.length < 9)
+	totalReceivedFloat = '0' + totalReceivedFloat
+    totalReceivedFloat = totalReceivedFloat.slice(0, -8) + '.' + totalReceivedFloat.slice(-8)
+    let totalSentFloat = summary.totalSent.toString()
+while (totalSentFloat.length < 9)
+	totalSentFloat = '0' + totalSentFloat
+    totalSentFloat = totalSentFloat.slice(0, -8) + '.' + totalSentFloat.slice(-8)
     ctx.body = {
-      balance: summary.balance.toString(),
-      totalReceived: summary.totalReceived.toString(),
-      totalSent: summary.totalSent.toString(),
+      addrStr: summary.addrStr.toString(),
+      balance: balanceFloat,
+      balanceSat: summary.balance.toString(),
+      totalReceived: totalReceivedFloat,
+totalReceivedSat: summary.totalReceived.toString(),
+totalSent: totalSentFloat,
+      totalSentSat: summary.totalSent.toString(),
       unconfirmed: summary.unconfirmed.toString(),
       staking: summary.staking.toString(),
       mature: summary.mature.toString(),
@@ -233,7 +249,7 @@ class AddressController extends Controller {
   }
 
   async qrc20BalanceHistory() {
-    const {Address} = this.app.qtuminfo.lib
+    const {Address} = this.app.bcsinfo.lib
     let {ctx} = this
     let tokenAddress = null
     if (ctx.state.token) {

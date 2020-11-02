@@ -2,7 +2,7 @@ const {Service} = require('egg')
 
 class ContractService extends Service {
   async getContractAddresses(list) {
-    const {Address} = this.app.qtuminfo.lib
+    const {Address} = this.app.bcsinfo.lib
     const chain = this.app.chain
     const {Contract} = this.ctx.model
 
@@ -107,7 +107,7 @@ class ContractService extends Service {
   }
 
   async getContractTransactionCount(contractAddress, addressIds) {
-    const TransferABI = this.app.qtuminfo.lib.Solidity.qrc20ABIs.find(abi => abi.name === 'Transfer')
+    const TransferABI = this.app.bcsinfo.lib.Solidity.qrc20ABIs.find(abi => abi.name === 'Transfer')
     const db = this.ctx.model
     let {sql} = this.ctx.helper
     let topic = Buffer.concat([Buffer.alloc(12), contractAddress])
@@ -139,7 +139,7 @@ class ContractService extends Service {
   }
 
   async getContractTransactions(contractAddress, addressIds) {
-    const TransferABI = this.app.qtuminfo.lib.Solidity.qrc20ABIs.find(abi => abi.name === 'Transfer')
+    const TransferABI = this.app.bcsinfo.lib.Solidity.qrc20ABIs.find(abi => abi.name === 'Transfer')
     const db = this.ctx.model
     let {sql} = this.ctx.helper
     let {limit, offset, reversed = true} = this.ctx.state.pagination
@@ -193,7 +193,7 @@ class ContractService extends Service {
   }
 
   async getContractBasicTransactions(contractAddress) {
-    const {Address, OutputScript} = this.app.qtuminfo.lib
+    const {Address, OutputScript} = this.app.bcsinfo.lib
     const {
       Header, Transaction, TransactionOutput, Contract, EvmReceipt: EVMReceipt, EvmReceiptLog: EVMReceiptLog,
       where, col
@@ -287,7 +287,7 @@ class ContractService extends Service {
   }
 
   async callContract(contract, data, sender) {
-    let client = new this.app.qtuminfo.rpc(this.app.config.qtuminfo.rpc)
+    let client = new this.app.bcsinfo.rpc(this.app.config.bcsinfo.rpc)
     return await client.callcontract(
       contract.toString('hex'),
       data.toString('hex'),
@@ -296,7 +296,7 @@ class ContractService extends Service {
   }
 
   async searchLogs({contract, topic1, topic2, topic3, topic4} = {}) {
-    const {Address} = this.app.qtuminfo.lib
+    const {Address} = this.app.bcsinfo.lib
     const db = this.ctx.model
     const {Header, Transaction, EvmReceipt: EVMReceipt, EvmReceiptLog: EVMReceiptLog, Contract} = db
     const {in: $in} = this.ctx.app.Sequelize.Op
@@ -393,7 +393,7 @@ class ContractService extends Service {
     }
     const {Contract} = this.ctx.model
     const {in: $in} = this.app.Sequelize.Op
-    const {Address} = this.app.qtuminfo.lib
+    const {Address} = this.app.bcsinfo.lib
     let result = addresses.map(address => Buffer.compare(address, Buffer.alloc(20)) === 0 ? null : address)
 
     let contracts = await Contract.findAll({

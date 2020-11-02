@@ -10,9 +10,9 @@ class UpdatePriceSubscription extends Subscription {
 
   async subscribe() {
     let price = await this.ctx.service.misc.getPrices()
-    await this.app.redis.hset(this.app.name, 'qtum-price', JSON.stringify(price))
+    await this.app.redis.hset(this.app.name, 'bcs-price', JSON.stringify(price))
     this.app.io.of('/').to('coin')
-      .emit('qtum-price', price)
+      .emit('bcs-price', price)
   }
 }
 

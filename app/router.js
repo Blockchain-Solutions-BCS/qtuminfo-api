@@ -10,6 +10,7 @@ module.exports = app => {
   router.get('/total-max-supply', controller.info.totalMaxSupply)
   router.get('/circulating-supply', controller.info.circulatingSupply)
   router.get('/feerates', controller.info.feeRates)
+  router.get('/total-transactions', controller.info.totalTxs)
 
   router.get('/blocks', controller.block.list)
   router.get(
@@ -202,6 +203,7 @@ module.exports = app => {
   )
   router.get('/misc/prices', controller.misc.prices)
 
+  //router.get('/stats/total-transactions', controller.statistics.totalTransactions)
   router.get('/stats/daily-transactions', controller.statistics.dailyTransactions)
   router.get('/stats/block-interval', controller.statistics.blockInterval)
   router.get('/stats/address-growth', controller.statistics.addressGrowth)

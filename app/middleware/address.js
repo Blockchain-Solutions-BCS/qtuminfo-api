@@ -1,6 +1,6 @@
 module.exports = () => async function address(ctx, next) {
   ctx.assert(ctx.params.address, 404)
-  const {Address: RawAddress} = ctx.app.qtuminfo.lib
+  const {Address: RawAddress} = ctx.app.bcsinfo.lib
   const chain = ctx.app.chain
   const {Address} = ctx.model
   const {in: $in} = ctx.app.Sequelize.Op

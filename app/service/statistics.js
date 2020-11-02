@@ -1,6 +1,19 @@
 const {Service} = require('egg')
 
 class StatisticsService extends Service {
+  async getTotalTransactions() {
+    const db = this.ctx.model
+    const {sql} = this.ctx.helper
+    let result = await db.query(sql`
+      SELECT
+        COUNT(*) AS transactionsCount
+      FROM transaction
+    `, {type: db.QueryTypes.SELECT, transaction: this.ctx.state.transaction})
+    return result.map(({transactionsCount}) => ({
+      transactionsCount
+    }))
+ }
+
   async getDailyTransactions() {
     const db = this.ctx.model
     const {sql} = this.ctx.helper

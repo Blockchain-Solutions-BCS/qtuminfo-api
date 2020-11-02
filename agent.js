@@ -4,7 +4,7 @@ module.exports = function(agent) {
   let tip = null
 
   agent.messenger.on('egg-ready', () => {
-    let io = SocketClient(`http://localhost:${agent.config.qtuminfo.port}`)
+    let io = SocketClient(`http://localhost:${agent.config.bcsinfo.port}`)
     io.on('tip', newTip => {
       tip = newTip
       agent.messenger.sendToApp('block-tip', tip)
@@ -35,6 +35,7 @@ module.exports = function(agent) {
       agent.messenger.sendRandom('update-richlist')
       agent.messenger.sendRandom('update-qrc20-statistics')
       agent.messenger.sendRandom('update-daily-transactions')
+	  agent.messenger.sendRandom('update-total-transactions')
       agent.messenger.sendRandom('update-block-interval')
       agent.messenger.sendRandom('update-address-growth')
       lastTipHash = tip.hash

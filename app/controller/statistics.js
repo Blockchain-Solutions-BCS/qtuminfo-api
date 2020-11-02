@@ -11,6 +11,14 @@ class StatisticsController extends Controller {
     }))
   }
 
+  async totalTransactions() {
+	const {app, ctx} = this
+    let totalTransactions = JSON.parse(await app.redis.hget(app.name, 'total-transactions') || '[]')
+    ctx.body = totalTransactions.map(({transactionsCount}) => ({
+      totalTransactions: parseInt(transactionsCount)
+	}))
+  }
+
   async blockInterval() {
     const {app, ctx} = this
     let blockInterval = JSON.parse(await app.redis.hget(app.name, 'block-interval') || '[]')

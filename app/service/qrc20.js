@@ -50,7 +50,7 @@ class QRC20Service extends Service {
     if (hexAddresses.length === 0) {
       return []
     }
-    const {OutputScript, Solidity} = this.app.qtuminfo.lib
+    const {OutputScript, Solidity} = this.app.bcsinfo.lib
     const transferABI = Solidity.qrc20ABIs.find(abi => abi.name === 'transfer')
     const {
       Address, TransactionOutput,
@@ -174,7 +174,7 @@ class QRC20Service extends Service {
   }
 
   async getQRC20Balance(rawAddresses, tokenAddress) {
-    const {Address: RawAddress, OutputScript, Solidity} = this.app.qtuminfo.lib
+    const {Address: RawAddress, OutputScript, Solidity} = this.app.bcsinfo.lib
     const transferABI = Solidity.qrc20ABIs.find(abi => abi.name === 'transfer')
     const {
       Address, TransactionOutput,
@@ -262,7 +262,7 @@ class QRC20Service extends Service {
   }
 
   async getQRC20BalanceHistory(addresses, tokenAddress) {
-    const TransferABI = this.app.qtuminfo.lib.Solidity.qrc20ABIs.find(abi => abi.name === 'Transfer')
+    const TransferABI = this.app.bcsinfo.lib.Solidity.qrc20ABIs.find(abi => abi.name === 'Transfer')
     const db = this.ctx.model
     const {sql} = this.ctx.helper
     const {
@@ -475,7 +475,7 @@ class QRC20Service extends Service {
   }
 
   async getAllQRC20TokenTransactions() {
-    const TransferABI = this.app.qtuminfo.lib.Solidity.qrc20ABIs.find(abi => abi.name === 'Transfer')
+    const TransferABI = this.app.bcsinfo.lib.Solidity.qrc20ABIs.find(abi => abi.name === 'Transfer')
     const db = this.ctx.model
     const {sql} = this.ctx.helper
     let {limit, offset, reversed = true} = this.ctx.state.pagination
@@ -540,7 +540,7 @@ class QRC20Service extends Service {
   }
 
   async getQRC20TokenTransactions(contractAddress) {
-    const TransferABI = this.app.qtuminfo.lib.Solidity.qrc20ABIs.find(abi => abi.name === 'Transfer')
+    const TransferABI = this.app.bcsinfo.lib.Solidity.qrc20ABIs.find(abi => abi.name === 'Transfer')
     const db = this.ctx.model
     const {EvmReceiptLog: EVMReceiptLog} = db
     const {sql} = this.ctx.helper
@@ -633,7 +633,7 @@ class QRC20Service extends Service {
   }
 
   async updateQRC20Statistics() {
-    const TransferABI = this.app.qtuminfo.lib.Solidity.qrc20ABIs.find(abi => abi.name === 'Transfer')
+    const TransferABI = this.app.bcsinfo.lib.Solidity.qrc20ABIs.find(abi => abi.name === 'Transfer')
     const db = this.ctx.model
     const {Qrc20: QRC20, Qrc20Statistics: QRC20Statistics} = db
     const {sql} = this.ctx.helper

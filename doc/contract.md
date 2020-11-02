@@ -66,14 +66,14 @@ GET /contract/:contract/txs
     <tbody>
         <tr>
             <td colspan="3">
-              <a href="https://github.com/qtumproject/qtuminfo-api/blob/master/README.md#Pagination-Parameters">
+              <a href="https://github.com/bcsproject/bcsinfo-api/blob/master/README.md#Pagination-Parameters">
                 Pagination Parameters
               </a>
             </td>
         </tr>
         <tr>
             <td colspan="3">
-              <a href="https://github.com/qtumproject/qtuminfo-api/blob/master/README.md#Block--Timestamp-Filter-Parameters">
+              <a href="https://github.com/bcsproject/bcsinfo-api/blob/master/README.md#Block--Timestamp-Filter-Parameters">
                 Block / Timestamp Filter Parameters
               </a>
             </td>
@@ -135,14 +135,14 @@ GET /contract/:contract/basic-txs
     <tbody>
         <tr>
             <td colspan="3">
-              <a href="https://github.com/qtumproject/qtuminfo-api/blob/master/README.md#Pagination-Parameters">
+              <a href="https://github.com/bcsproject/bcsinfo-api/blob/master/README.md#Pagination-Parameters">
                 Pagination Parameters
               </a>
             </td>
         </tr>
         <tr>
             <td colspan="3">
-              <a href="https://github.com/qtumproject/qtuminfo-api/blob/master/README.md#Block--Timestamp-Filter-Parameters">
+              <a href="https://github.com/bcsproject/bcsinfo-api/blob/master/README.md#Block--Timestamp-Filter-Parameters">
                 Block / Timestamp Filter Parameters
               </a>
             </td>
@@ -354,14 +354,14 @@ GET /searchlogs
     <tbody>
         <tr>
             <td colspan="3">
-              <a href="https://github.com/qtumproject/qtuminfo-api/blob/master/README.md#Pagination-Parameters">
+              <a href="https://github.com/bcsproject/bcsinfo-api/blob/master/README.md#Pagination-Parameters">
                 Pagination Parameters
               </a>
             </td>
         </tr>
         <tr>
             <td colspan="3">
-              <a href="https://github.com/qtumproject/qtuminfo-api/blob/master/README.md#Block--Timestamp-Filter-Parameters">
+              <a href="https://github.com/bcsproject/bcsinfo-api/blob/master/README.md#Block--Timestamp-Filter-Parameters">
                 Block / Timestamp Filter Parameters
               </a>
             </td>

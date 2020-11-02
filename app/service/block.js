@@ -78,7 +78,7 @@ class BlockService extends Service {
 
   async getRawBlock(arg) {
     const {Header, Transaction} = this.ctx.model
-    const {Header: RawHeader, Block: RawBlock} = this.app.qtuminfo.lib
+    const {Header: RawHeader, Block: RawBlock} = this.app.bcsinfo.lib
     let filter
     if (Number.isInteger(arg)) {
       filter = {height: arg}
@@ -307,8 +307,8 @@ class BlockService extends Service {
 
   async getBlockAddressTransactions(height) {
     const {Address, Transaction, BalanceChange, EvmReceipt: EVMReceipt, EvmReceiptLog: EVMReceiptLog, Contract} = this.ctx.model
-    const {Address: RawAddress} = this.app.qtuminfo.lib
-    const TransferABI = this.app.qtuminfo.lib.Solidity.qrc20ABIs.find(abi => abi.name === 'Transfer')
+    const {Address: RawAddress} = this.app.bcsinfo.lib
+    const TransferABI = this.app.bcsinfo.lib.Solidity.qrc20ABIs.find(abi => abi.name === 'Transfer')
     let result = []
     let balanceChanges = await BalanceChange.findAll({
       attributes: [],

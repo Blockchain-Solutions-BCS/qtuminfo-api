@@ -10,7 +10,7 @@ class TransactionService extends Service {
       where, col
     } = this.ctx.model
     const {in: $in} = this.app.Sequelize.Op
-    const {Address: RawAddress} = this.app.qtuminfo.lib
+    const {Address: RawAddress} = this.app.bcsinfo.lib
 
     let transaction = await Transaction.findOne({
       where: {id},
@@ -403,7 +403,7 @@ class TransactionService extends Service {
 
   async getRawTransaction(id) {
     const {Transaction, Witness, TransactionOutput, TransactionInput} = this.ctx.model
-    const {Transaction: RawTransaction, Input, Output, OutputScript} = this.app.qtuminfo.lib
+    const {Transaction: RawTransaction, Input, Output, OutputScript} = this.app.bcsinfo.lib
 
     let transaction = await Transaction.findOne({
       where: {id},
@@ -498,7 +498,7 @@ class TransactionService extends Service {
   }
 
   async getMempoolTransactionAddresses(id) {
-    const {Address: RawAddress} = this.app.qtuminfo.lib
+    const {Address: RawAddress} = this.app.bcsinfo.lib
     const {Address, Transaction, BalanceChange, EvmReceipt: EVMReceipt} = this.ctx.model
     let balanceChanges = await BalanceChange.findAll({
       attributes: [],
@@ -538,7 +538,7 @@ class TransactionService extends Service {
   }
 
   async sendRawTransaction(data) {
-    let client = new this.app.qtuminfo.rpc(this.app.config.qtuminfo.rpc)
+    let client = new this.app.bcsinfo.rpc(this.app.config.bcsinfo.rpc)
     let id = await client.sendrawtransaction(data.toString('hex'))
     return Buffer.from(id, 'hex')
   }
@@ -609,7 +609,7 @@ class TransactionService extends Service {
   }
 
   transformInput(input, index, transaction, {brief}) {
-    const {InputScript, OutputScript} = this.app.qtuminfo.lib
+    const {InputScript, OutputScript} = this.app.bcsinfo.lib
     let scriptSig = InputScript.fromBuffer(input.scriptSig, {
       scriptPubKey: OutputScript.fromBuffer(input.scriptPubKey || Buffer.alloc(0)),
       witness: input.witness,
@@ -639,7 +639,7 @@ class TransactionService extends Service {
   }
 
   transformOutput(output, index, {brief}) {
-    const {OutputScript} = this.app.qtuminfo.lib
+    const {OutputScript} = this.app.bcsinfo.lib
     let scriptPubKey = OutputScript.fromBuffer(output.scriptPubKey)
     let type = scriptPubKey.isEmpty() ? 'empty' : scriptPubKey.type
     let result = {
@@ -678,7 +678,7 @@ class TransactionService extends Service {
   }
 
   async transformQRC20Transfers(outputs) {
-    const TransferABI = this.app.qtuminfo.lib.Solidity.qrc20ABIs.find(abi => abi.name === 'Transfer')
+    const TransferABI = this.app.bcsinfo.lib.Solidity.qrc20ABIs.find(abi => abi.name === 'Transfer')
     let result = []
     for (let output of outputs) {
       if (output.evmReceipt) {
@@ -705,7 +705,7 @@ class TransactionService extends Service {
   }
 
   async transformQRC20UnconfirmedTransfers(outputs) {
-    const {OutputScript, Solidity} = this.app.qtuminfo.lib
+    const {OutputScript, Solidity} = this.app.bcsinfo.lib
     const transferABI = Solidity.qrc20ABIs.find(abi => abi.name === 'transfer')
     const {Qrc20: QRC20} = this.ctx.model
     let result = []
@@ -751,7 +751,7 @@ class TransactionService extends Service {
   }
 
   async transformQRC721Transfers(outputs) {
-    const TransferABI = this.app.qtuminfo.lib.Solidity.qrc20ABIs.find(abi => abi.name === 'Transfer')
+    const TransferABI = this.app.bcsinfo.lib.Solidity.qrc20ABIs.find(abi => abi.name === 'Transfer')
     let result = []
     for (let output of outputs) {
       if (output.evmReceipt) {
@@ -895,7 +895,7 @@ class TransactionService extends Service {
   }
 
   async getContractTransaction(receiptId) {
-    const {Address: RawAddress, OutputScript} = this.app.qtuminfo.lib
+    const {Address: RawAddress, OutputScript} = this.app.bcsinfo.lib
     const {
       Header, Address, Transaction, TransactionOutput,
       EvmReceipt: EVMReceipt, EvmReceiptLog: EVMReceiptLog, Contract,

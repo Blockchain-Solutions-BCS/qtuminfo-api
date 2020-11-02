@@ -19,11 +19,11 @@ class InfoService extends Service {
   getTotalSupply() {
     let height = this.app.blockchainInfo.tip.height
     if (height <= this.app.chain.lastPoWBlockHeight) {
-      return height * 20000
+      return height * 100000
     } else {
-      let supply = 1e8
-      let reward = 4
-      let interval = 985500
+      let supply = 5*1e8
+      let reward = 1000
+      let interval = 250000
       let stakeHeight = height - this.app.chain.lastPoWBlockHeight
       let halvings = 0
       while (halvings < 7 && stakeHeight > interval) {
@@ -36,14 +36,14 @@ class InfoService extends Service {
   }
 
   getTotalMaxSupply() {
-    return 1e8 + 985500 * 4 * (1 - 1 / 2 ** 7) / (1 - 1 / 2)
+    return 5*1e8 + 250000 * 1000 * (1 - 1 / 2 ** 7) / (1 - 1 / 2)
   }
 
   getCirculatingSupply() {
     let height = this.app.blockchainInfo.tip.height
     let totalSupply = this.getTotalSupply(height)
     if (this.app.chain.name === 'mainnet') {
-      return totalSupply - 575e4
+      return totalSupply
     } else {
       return totalSupply
     }
@@ -54,7 +54,7 @@ class InfoService extends Service {
     const {gte: $gte} = this.app.Sequelize.Op
     let height = await Header.aggregate('height', 'max', {transaction: this.ctx.state.transaction})
     let list = await Header.findAll({
-      where: {height: {[$gte]: height - 500}},
+      where: {height: {[$gte]: height - 72}},
       attributes: ['timestamp', 'bits'],
       order: [['height', 'ASC']],
       transaction: this.ctx.state.transaction
@@ -67,7 +67,7 @@ class InfoService extends Service {
   }
 
   async getFeeRates() {
-    let client = new this.app.qtuminfo.rpc(this.app.config.qtuminfo.rpc)
+    let client = new this.app.bcsinfo.rpc(this.app.config.bcsinfo.rpc)
     let results = await Promise.all([2, 4, 6, 10, 12, 24].map(blocks => client.estimatesmartfee(blocks)))
     return [
       {blocks: 2, feeRate: results[0].feerate || 0.004},
@@ -80,7 +80,7 @@ class InfoService extends Service {
   }
 
   async getDGPInfo() {
-    let client = new this.app.qtuminfo.rpc(this.app.config.qtuminfo.rpc)
+    let client = new this.app.bcsinfo.rpc(this.app.config.bcsinfo.rpc)
     let info = await client.getdgpinfo()
     return {
       maxBlockSize: info.maxblocksize,

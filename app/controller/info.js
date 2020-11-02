@@ -20,6 +20,12 @@ class InfoController extends Controller {
   async feeRates() {
     this.ctx.body = JSON.parse(await this.app.redis.hget(this.app.name, 'feerate')).filter(item => [2, 4, 6, 12, 24].includes(item.blocks))
   }
+  
+  async totalTxs() {
+    const {app, ctx} = this
+    let totalTransactions = JSON.parse(await app.redis.hget(app.name, 'total-transactions') || '[]')
+	ctx.body = totalTransactions.reduce((acc, res) =>  acc + parseInt(res.transactionsCount), 0)
+  }
 }
 
 module.exports = InfoController

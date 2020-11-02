@@ -23,6 +23,12 @@ module.exports = app => {
     let dailyTransactions = await ctx.service.statistics.getDailyTransactions()
     await app.redis.hset(app.name, 'daily-transactions', JSON.stringify(dailyTransactions))
   })
+  
+  app.messenger.on('update-total-transactions', async () => {
+    let ctx = app.createAnonymousContext()
+    let totalTransactions = await ctx.service.statistics.getTotalTransactions()
+    await app.redis.hset(app.name, 'total-transactions', JSON.stringify(totalTransactions))
+  })
 
   app.messenger.on('update-block-interval', async () => {
     let ctx = app.createAnonymousContext()

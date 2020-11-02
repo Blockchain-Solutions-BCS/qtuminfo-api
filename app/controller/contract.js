@@ -150,7 +150,7 @@ class ContractController extends Controller {
   }
 
   async callContract() {
-    const {Address} = this.app.qtuminfo.lib
+    const {Address} = this.app.bcsinfo.lib
     let {ctx} = this
     let {data, sender} = ctx.query
     ctx.assert(ctx.state.contract.vm === 'evm', 400)
