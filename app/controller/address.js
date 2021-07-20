@@ -1,30 +1,45 @@
 const {Controller} = require('egg')
+const {Decoder} = require('BCSweb3')
 
 class AddressController extends Controller {
   async summary() {
     let {ctx} = this
     let {address} = ctx.state
     let summary = await ctx.service.address.getAddressSummary(address.addressIds, address.p2pkhAddressIds, address.rawAddresses)
+    let {totalCount, transactions} = await ctx.service.address.getAddressTransactions(address.addressIds, address.rawAddresses)
+    let hexAddress = ''
+    JSON.parse(JSON.stringify(address.rawAddresses[0].data)).data.forEach(byte => {
+      byte.toString(16).length == 1 ? hexAddress += '0' + byte.toString(16) : hexAddress += byte.toString(16)
+    })
+
     let balanceFloat = summary.balance.toString()
-while (balanceFloat.length < 9)
-	balanceFloat = '0' + balanceFloat
+    while (balanceFloat.length < 9)
+      balanceFloat = '0' + balanceFloat
+
     balanceFloat = balanceFloat.slice(0, -8) + '.' + balanceFloat.slice(-8)
     let totalReceivedFloat = summary.totalReceived.toString()
-while (totalReceivedFloat.length < 9)
-	totalReceivedFloat = '0' + totalReceivedFloat
+
+    while (totalReceivedFloat.length < 9)
+      totalReceivedFloat = '0' + totalReceivedFloat
     totalReceivedFloat = totalReceivedFloat.slice(0, -8) + '.' + totalReceivedFloat.slice(-8)
     let totalSentFloat = summary.totalSent.toString()
-while (totalSentFloat.length < 9)
-	totalSentFloat = '0' + totalSentFloat
+
+    while (totalSentFloat.length < 9)
+      totalSentFloat = '0' + totalSentFloat
     totalSentFloat = totalSentFloat.slice(0, -8) + '.' + totalSentFloat.slice(-8)
+
     ctx.body = {
-      addrStr: summary.addrStr.toString(),
+      addrStr: Decoder.toBCSAddress(hexAddress, true),
+      hexAddress: hexAddress,
       balance: balanceFloat,
       balanceSat: summary.balance.toString(),
+      coinBalance: (Number.parseInt(summary.balance)/1e8).toString(),
       totalReceived: totalReceivedFloat,
-totalReceivedSat: summary.totalReceived.toString(),
-totalSent: totalSentFloat,
+      totalReceivedSat: summary.totalReceived.toString(),
+      totalCoinReceived: (Number.parseInt(summary.totalReceived)/1e8).toString(),
+      totalSent: totalSentFloat,
       totalSentSat: summary.totalSent.toString(),
+      totalCoinSent: (Number.parseInt(summary.totalSent)/1e8).toString(),
       unconfirmed: summary.unconfirmed.toString(),
       staking: summary.staking.toString(),
       mature: summary.mature.toString(),
@@ -49,7 +64,8 @@ totalSent: totalSentFloat,
         count: item.count
       })),
       ranking: summary.ranking,
-      transactionCount: summary.transactionCount,
+      totalCount,
+      transactions: transactions.map(id => id.toString('hex')),
       blocksMined: summary.blocksMined
     }
   }
@@ -223,7 +239,7 @@ totalSent: totalSentFloat,
       outputIndex: utxo.outputIndex,
       scriptPubKey: utxo.scriptPubKey.toString('hex'),
       address: utxo.address,
-      value: utxo.value.toString(),
+      value: parseInt(utxo.value.toString()),
       isStake: utxo.isStake,
       blockHeight: utxo.blockHeight,
       confirmations: utxo.confirmations

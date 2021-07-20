@@ -47,6 +47,16 @@ class TransactionController extends Controller {
     ))
   }
 
+  async receipt() {
+    const {ctx} = this
+    ctx.assert(ctx.params.id && /^[0-9a-f]{64}$/i.test(ctx.params.id), 404)
+    let brief = 'brief' in ctx.query
+    let id = Buffer.from(ctx.params.id, 'hex')
+    let transaction = await ctx.service.transaction.getTransaction(id)
+    ctx.assert(transaction, 404)
+    ctx.body = await ctx.service.transaction.transformTransactionToReceipt(transaction)
+  }
+
   async list() {
     const {ctx} = this
     let {totalCount, ids} = await ctx.service.transaction.getAllTransactions()

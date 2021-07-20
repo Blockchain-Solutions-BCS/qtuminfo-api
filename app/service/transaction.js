@@ -1,4 +1,5 @@
 const {Service} = require('egg')
+const { Encoder } = require('BCSweb3')
 
 class TransactionService extends Service {
   async getTransaction(id) {
@@ -608,6 +609,39 @@ class TransactionService extends Service {
     }
   }
 
+  async transformTransactionToReceipt(transaction) {
+    let outputs = transaction.outputs.map((output, index) => this.transformOutput(output, index, {brief: false}))
+    let receiptOutputIndex
+    let gasUsed
+    let log = []
+    let contractAddress
+    let sender
+
+    outputs.forEach((output, index) => {
+      if (output.receipt) {
+        receiptOutputIndex = index
+        gasUsed = output.receipt.gasUsed
+        log = output.receipt.logs
+        contractAddress = output.receipt.contractAddress
+        sender = output.receipt.sender
+      }
+    })
+
+    return [{
+      blockHash: transaction.block && transaction.block.hash.toString('hex'),
+      blockNumber: transaction.block && transaction.block.height,
+      id: transaction.id.toString('hex'),
+      transactionHash: transaction.hash.toString('hex'),
+      from: sender ? Encoder.addressToHex(sender).substr(-40) : null,
+      to: contractAddress || null,
+      log: log || [],
+      contractAddress: contractAddress || null,
+      outputIndex: receiptOutputIndex || null,
+      gasUsed: gasUsed || null,
+      cumulativeGasUsed: gasUsed
+    }]
+  }
+
   transformInput(input, index, transaction, {brief}) {
     const {InputScript, OutputScript} = this.app.bcsinfo.lib
     let scriptSig = InputScript.fromBuffer(input.scriptSig, {
@@ -777,7 +811,7 @@ class TransactionService extends Service {
   }
 
   async getBasicTransaction(transactionId, addressIds) {
-    const {Header, Transaction, TransactionOutput, TransactionInput, GasRefund, EvmReceipt: EVMReceipt, where, col} = this.ctx.model
+    const {Header, Address, Transaction, TransactionOutput, TransactionInput, GasRefund, EvmReceipt: EVMReceipt, where, col} = this.ctx.model
 
     let transaction = await Transaction.findOne({
       where: {_id: transactionId},
@@ -797,12 +831,58 @@ class TransactionService extends Service {
     let inputs = await TransactionInput.findAll({
       where: {transactionId},
       attributes: ['value', 'addressId'],
+      include: [
+        {
+          model: Transaction,
+          as: 'outputTransaction',
+          required: false,
+          attributes: ['id']
+        },
+        {
+          model: TransactionOutput,
+          as: 'output',
+          on: {
+            transactionId: where(col('output.transaction_id'), '=', col('transaction_input.output_id')),
+            outputIndex: where(col('output.output_index'), '=', col('transaction_input.output_index'))
+          },
+          required: false,
+          attributes: ['outputIndex', 'scriptPubKey']
+        },
+        {
+          model: Address,
+          as: 'address',
+          required: false,
+          attributes: ['type', 'string']
+        }
+      ],
       transaction: this.ctx.state.transaction
     })
     let outputs = await TransactionOutput.findAll({
       where: {transactionId},
       attributes: ['value', 'addressId'],
       include: [
+        {
+          model: Transaction,
+          as: 'inputTransaction',
+          required: false,
+          attributes: ['id']
+        },
+        {
+          model: TransactionInput,
+          as: 'input',
+          on: {
+            transactionId: where(col('input.transaction_id'), '=', col('transaction_output.input_id')),
+            inputIndex: where(col('input.input_index'), '=', col('transaction_output.input_index'))
+          },
+          required: false,
+          attributes: ['inputIndex']
+        },
+        {
+          model: Address,
+          as: 'address',
+          required: false,
+          attributes: ['type', 'string']
+        },
         {
           model: EVMReceipt,
           as: 'evmReceipt',
@@ -878,8 +958,34 @@ class TransactionService extends Service {
 
     return {
       id: transaction.id,
-      inputs: inputs.map(input => ({value: input.value, addressId: input.addressId})),
-      outputs: outputs.map(output => ({value: output.value, addressId: output.addressId})),
+      inputs: inputs.map((input) => {
+        let inputObject = {
+          prevTxId: input.outputTransaction ? input.outputTransaction.id : Buffer.alloc(32),
+          outputIndex: input.output && input.output.outputIndex,
+          scriptSig: input.scriptSig,
+          sequence: input.sequence,
+          value: input.value,
+          scriptPubKey: input.output && input.output.scriptPubKey
+        }
+        if (input.address) {
+            inputObject.address = input.address.string
+        }
+        return inputObject
+      }),
+      outputs: outputs.map(output => {
+        let outputObject = {
+          scriptPubKey: output.scriptPubKey,
+          value: output.value,
+        }
+        if (output.address) {
+            outputObject.address = output.address.string
+        }
+        if (output.inputTransaction) {
+          outputObject.spentTxId = output.inputTransaction.id
+          outputObject.spentIndex = output.input.inputIndex
+        }
+        return outputObject
+      }),
       ...transaction.blockHeight === 0xffffffff ? {} : {
         blockHeight: transaction.blockHeight,
         blockHash: transaction.header.hash,
