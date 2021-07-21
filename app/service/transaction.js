@@ -1,5 +1,5 @@
 const {Service} = require('egg')
-const { Encoder } = require('BCSweb3')
+const { Encoder } = require('bcsweb3')
 
 class TransactionService extends Service {
   async getTransaction(id) {

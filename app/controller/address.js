@@ -1,5 +1,5 @@
 const {Controller} = require('egg')
-const {Decoder} = require('BCSweb3')
+const {Decoder} = require('bcsweb3')
 
 class AddressController extends Controller {
   async summary() {

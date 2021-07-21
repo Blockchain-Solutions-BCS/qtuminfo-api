@@ -9,7 +9,7 @@ class AddressService extends Service {
     let hexAddresses = rawAddresses.filter(address => address.type === Address.PAY_TO_PUBLIC_KEY_HASH).map(address => address.data)
     //let addressStr =  p2pkhAddressIds.map(address => address.string)
     let [
-addrStr,
+      addrStr,
       {totalReceived, totalSent},
       unconfirmed,
       staking,
@@ -20,7 +20,7 @@ addrStr,
       blocksMined,
       transactionCount
     ] = await Promise.all([
-this.getAddressStr(addressIds),
+    this.getAddressStr(addressIds),
       balanceService.getTotalBalanceChanges(addressIds),
       balanceService.getUnconfirmedBalance(addressIds),
       balanceService.getStakingBalance(addressIds),
